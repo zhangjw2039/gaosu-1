@@ -1,0 +1,79 @@
+{
+  "id": "1756577",
+  "name": "gaosu3",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "839546",
+      "name": "查看",
+      "font_class": "chakan",
+      "unicode": "e63b",
+      "unicode_decimal": 58939
+    },
+    {
+      "icon_id": "2199791",
+      "name": "saoma",
+      "font_class": "saoma",
+      "unicode": "e613",
+      "unicode_decimal": 58899
+    },
+    {
+      "icon_id": "3293818",
+      "name": "任务",
+      "font_class": "Group",
+      "unicode": "e6d6",
+      "unicode_decimal": 59094
+    },
+    {
+      "icon_id": "8341619",
+      "name": "测试",
+      "font_class": "ceshi",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
+      "icon_id": "8870955",
+      "name": "采集",
+      "font_class": "caiji",
+      "unicode": "e62c",
+      "unicode_decimal": 58924
+    },
+    {
+      "icon_id": "9538074",
+      "name": "异常",
+      "font_class": "yichang",
+      "unicode": "e70b",
+      "unicode_decimal": 59147
+    },
+    {
+      "icon_id": "10487457",
+      "name": "地图",
+      "font_class": "ditu",
+      "unicode": "e68b",
+      "unicode_decimal": 59019
+    },
+    {
+      "icon_id": "11855590",
+      "name": "维修单",
+      "font_class": "weixiudan",
+      "unicode": "e60a",
+      "unicode_decimal": 58890
+    },
+    {
+      "icon_id": "12889052",
+      "name": "记录",
+      "font_class": "jilu",
+      "unicode": "e6f7",
+      "unicode_decimal": 59127
+    },
+    {
+      "icon_id": "13921239",
+      "name": "聊天框",
+      "font_class": "liaotiankuang",
+      "unicode": "e753",
+      "unicode_decimal": 59219
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+body ,html, #app{
+    height: 100%;
+}
+#app>div {
+    height: 100%;
+}
+.van-tabs {
+    height: 100%;
+}
+.van-tabs__content {
+    height: calc(100% - 44px);
+}
+.van-tab__pane {
+    height: 100%;
+}
+.van-grid-item__text {
+    color: black!important;
+}
+div[data-v-edc47d28] {
+    height: 100%;
+}
+
+.errItemFalseSb-box-item {
+    position: relative;
+    margin: 0 5px;
+    border-bottom: 1px solid #ebedf0;
+    overflow: hidden;
+    padding: 10px 0;
+    font-size: 15px;
+}
+.errItemFalseSb-box-item-l {
+    float: left;
+    margin: 0 0 0 10px;
+}
+.errItemFalseSb-box-item-r {
+    position: relative;
+    float: right;
+    color: #8B8386;
+    margin: 0 10px 0 0;
+}
+.errItemFalseSb-box-item-t {
+    font-weight: 400;
+    font-size: 15px;
+    padding: 0;
+    margin: 0 0 0 10px;
+}
+.errItemFalseSb-box-item img {
+    margin: 10px 0 0 10px;
+    width: 80px;
+    height: 80px;
+}
+.errItemFalseSb-box-item-audio {
+    float: right;
+    width: 270px;
+    height: 20px;
+}
+.errItemFalseSb-box-item-h1 {
+    font-size: 20px;
+    margin: 0 0 0 10px;
+}
+.errItemFalseSb-box-item-p {
+    margin: 0 0 0 10px;
+}
+.btm-msg {
+    border: none!important;
+    margin: 0!important;
+    width: 100%;
+    padding: 0!important;
+}
+.btm-weixiu {
+    border: none!important;
+    margin: 10px 5%!important;
+    width: 90%;
+}
+.thing-miaosu {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100px;
+    border: 1px solid #ccc;
+}
+.my-icon-center {
+    position: absolute !important;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+  }
+.my-icon-nof-center {
+    position: absolute !important;
+    top: 50%;
+    right: 5px;
+    transform: translateY(-50%);
+}
+.font-red {
+    color: red;
+}
+.font-green {
+color: green;
+}
