@@ -1,12 +1,12 @@
 <template>
   <div>
-    <div class="errItemFalseSb-box-item">
+    <div class="errItemFalseSb-box-item" @click="toMap">
       <p class="errItemFalseSb-box-item-l">上报位置</p>
-      <p class="errItemFalseSb-box-item-r">></p>
+      <van-icon name="arrow" class="my-icon-nof-center" />
     </div>
     <div class="errItemFalseSb-box-item">
       <p class="errItemFalseSb-box-item-l">上下行</p>
-      <p class="errItemFalseSb-box-item-r">未定...</p>
+      <p class="errItemFalseSb-box-item-r">{{list.upDown === 1? '上行': '下行'}}</p>
     </div>
     <div class="errItemFalseSb-box-item">
       <p class="errItemFalseSb-box-item-l">责任单位</p>
@@ -29,12 +29,12 @@
       <audio class="errItemFalseSb-box-item-audio" src controls></audio>
     </div>
     <div class="errItemFalseSb-box-item">
-      <h3 class="errItemFalseSb-box-item-t">描述</h3>
-      <textarea readonly class="thing-miaosu" placeholder="描述"></textarea>
+      <h3 class="errItemFalseSb-box-item-t">上报描述</h3>
+      <textarea v-model="list.convenientlyInfo" readonly class="thing-miaosu" placeholder="描述"></textarea>
     </div>
     <div class="errItemFalseSb-box-item">
       <p class="errItemFalseSb-box-item-l">维修单位</p>
-      <p class="errItemFalseSb-box-item-r">未定...</p>
+      <p class="errItemFalseSb-box-item-r">{{list.groupName}}</p>
     </div>
     <div class="errItemFalseSb-box-item">
       <p class="errItemFalseSb-box-item-l">指派时间</p>
@@ -46,7 +46,7 @@
     </div>
     <div class="errItemFalseSb-box-item">
       <p class="errItemFalseSb-box-item-l">维修方案</p>
-      <textarea v-model="wxInfo" class="thing-miaosu" placeholder="维修方案"></textarea>
+      <textarea readonly v-model="list.maintenanceinfo" class="thing-miaosu" placeholder="维修方案"></textarea>
     </div>
     <!-- 上传图片 -->
     <div class="errItemFalseSb-box-item">
@@ -78,11 +78,12 @@
       <p class="errItemFalseSb-box-item-l">维修描述</p>
       <textarea v-model="info" class="thing-miaosu" placeholder="维修方案"></textarea>
     </div>
-    <van-button class="btm-msg" type="primary" @click="upload">完成维修</van-button>
+    <van-button :loading="loading" :disabled="!rols1" class="btm-msg" type="primary" @click="upload">完成维修</van-button>
   </div>
 </template>
 <script>
 import wx from 'weixin-js-sdk'
+import { mapState } from 'vuex'
 export default {
   data () {
     return {
@@ -92,7 +93,7 @@ export default {
       localId: '',
       info: '',
       list: {},
-      wxInfo: ''
+      loading: false
     }
   },
   methods: {
@@ -132,7 +133,12 @@ export default {
     },
     // 上传数据
     async upload () {
-      const { data } = await this.$ajax.post(`repairOrder/complete?sid=${window.sessionStorage.getItem('token')}&type=2`, {
+      if (this.localId === '' || this.showImageList.length === 0 || this.info.trim() === '') {
+        this.$toast('信息不全')
+        return
+      }
+      this.loading = true
+      const { data } = await this.$ajax.post(`repairOrder/complete?sid=${window.localStorage.getItem('token')}&type=2`, {
         id: this.list.id,
         record: this.localId,
         pics: this.showImageList,
@@ -146,6 +152,17 @@ export default {
       } else {
         this.$toast('维修提交失败')
       }
+      this.loading = false
+    },
+    toMap () {
+      this.$router.push({
+        path: '/map',
+        name: '/map',
+        query: {
+          lat: this.list.lat,
+          lng: this.list.lng
+        }
+      })
     }
   },
   mounted () {
@@ -153,6 +170,12 @@ export default {
     this.util.wxConfig.call(this, wx)
     this.list = this.$route.query
     console.log(this.list)
+  },
+  computed: {
+    ...mapState(['rols']),
+    rols1 () {
+      return this.rols.includes('repairOrder:complete')
+    }
   }
 }
 </script>

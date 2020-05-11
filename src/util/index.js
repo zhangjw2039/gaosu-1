@@ -4,14 +4,14 @@ export default {
   async wxConfig (wx) {
     const { data } = await this.$ajax.get('wx/getsdk', {
       params: {
-        sid: window.sessionStorage.getItem('token'),
+        sid: window.localStorage.getItem('token'),
         url: window.location.href.split('#')[0]
       }
     })
-    // console.log(data)
+    console.log(data)
     if (data) {
       wx.config({
-        debug: false,
+        debug: true,
         appId: data.appid,
         timestamp: data.timestamp,
         nonceStr: data.noncestr,
@@ -30,14 +30,15 @@ export default {
   },
 
   // 微信扫二维码请求
-  wxScanQRCode (wx, routerPath) {
+  wxScanQRCode (wx, routerPath, handle) {
     wx.ready(() => {
       wx.scanQRCode({
         needResult: 1,
         scanType: ['qrCode', 'barCode'],
         success: (res) => {
-          // var result = JSON.stringify(res.resultStr.replace('"', ''))
-          // this.$store.commit('changQrCodeId', result)
+          var result = JSON.stringify(res.resultStr.replace('"', ''))
+          console.log(result)
+          this.$store.commit(handle, result)
           this.$router.push(routerPath)
         }
       })

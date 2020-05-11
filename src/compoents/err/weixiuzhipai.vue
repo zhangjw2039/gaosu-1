@@ -30,10 +30,11 @@
       <van-cell class="van-field-nopadding" title="选择维修日期" :value="date" @click="show = true" />
     </div>
     <van-calendar v-model="show" type="range" @confirm="onDateConfirm" />
-    <van-button type="info" @click="onSubmit">提交维修单</van-button>
+    <van-button :loading="loading" :disabled="!rols1" type="info" @click="onSubmit">提交维修单</van-button>
   </div>
 </template>
 <script>
+import { mapState } from 'vuex'
 export default {
   data () {
     return {
@@ -45,7 +46,8 @@ export default {
       date: '',
       show: false,
       info: '',
-      id: ''
+      id: '',
+      loading: false
     }
   },
   methods: {
@@ -74,8 +76,13 @@ export default {
       // 获取维修单位id
       console.log(this.value)
       console.log(this.id)
+      if (this.id === '' || this.info.trim() === '' || this.date === '') {
+        this.$toast('信息不完整')
+        return
+      }
+      this.loading = true
       const params = {}
-      params.assignInfo = this.info
+      params.maintenanceinfo = this.info
       params.assignCompletionTime = this.date
       params.repairorderGroupId = this.id
       if (this.data.convenientlyInfo) {
@@ -83,11 +90,7 @@ export default {
       } else {
         params.chkQuestionId = this.data.id
       }
-      const { data } = await this.$ajax.post(
-        'http://192.168.0.80:9090/assign?sid=' +
-          window.sessionStorage.getItem('token'),
-        params
-      )
+      const { data } = await this.$ajax.post('assign?sid=' + window.localStorage.getItem('token'), params)
       console.log(data)
       if (data.code === 200) {
         this.$toast('提交维修指派成功')
@@ -95,14 +98,15 @@ export default {
       } else {
         this.$toast(data.jwje)
       }
+      this.loading = false
     },
     // 获取维修单位
     async getEquip () {
       const {
         data: { data }
       } = await this.$ajax.get(
-        'http://192.168.0.80:9090/equip/tree?sid=' +
-          window.sessionStorage.getItem('token')
+        'equip/tree?sid=' +
+          window.localStorage.getItem('token')
       )
       this.columnsAll = data
       this.columns = this.deepCopy(data)
@@ -154,6 +158,12 @@ export default {
     this.getEquip()
     this.data = this.$route.query
     console.log(this.data)
+  },
+  computed: {
+    ...mapState(['rols']),
+    rols1 () {
+      return this.rols.includes('assign:add')
+    }
   }
 }
 </script>

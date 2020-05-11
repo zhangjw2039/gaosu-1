@@ -66,7 +66,7 @@ export default {
           rol: 'reported'
         },
         {
-          title: 'test',
+          title: '登录',
           icon: 'icon-ceshi',
           colr: '#00CED1',
           rol: 'login'
@@ -74,15 +74,16 @@ export default {
       ],
       routerList: ['/scan', '/abnormal', '/patrol', '/repairOrder', '/map', '/facility', '/bind', '/reported', '/login'],
       rolsList: ['map', 'login']
+      // codeId: ''
     }
   },
   methods: {
     handle (index) {
       if (index === 0) {
-        this.util.wxScanQRCode.call(this, wx, '/scan')
+        this.util.wxScanQRCode.call(this, wx, '/scan', 'changeSaomaCodeID')
         return
       } else if (index === 6) {
-        this.util.wxScanQRCode.call(this, wx, '/bind')
+        this.util.wxScanQRCode.call(this, wx, '/bind', 'changQrCodeId')
         return
       }
       this.$router.push(this.routerList[index])
@@ -91,8 +92,11 @@ export default {
   mounted () {
     this.util.wxConfig.call(this, wx)
     this.rolsList = this.rolsList.concat(this.util.getRols(this.$store.state.rols))
+    window.localStorage.setItem('OPENID', window.sessionStorage.getItem('openId'))
     console.log(this.rolsList)
     console.log(this.$store.state.rols)
+    console.log(this.$router)
+    console.log(window.location.href.split('#')[0])
   }
 }
 </script>

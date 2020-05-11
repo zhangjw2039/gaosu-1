@@ -166,9 +166,9 @@ export default {
 
     // 获取设施数据
     async getData1 (handle = 0, pageNum = 1) {
-      const { data } = await this.$ajax.get('http://192.168.0.80:9090/chkQuestion/list', {
+      const { data } = await this.$ajax.get('chkQuestion/list', {
         params: {
-          sid: window.sessionStorage.getItem('token'),
+          sid: window.localStorage.getItem('token'),
           handle,
           pageNum,
           pageSize: 10
@@ -190,9 +190,9 @@ export default {
 
     // 获取随手报信息
     async getData2 (handle = 0, pageNum = 1) {
-      const { data } = await this.$ajax.get('http://192.168.0.80:9090/conveniently/list', {
+      const { data } = await this.$ajax.get('conveniently/list', {
         params: {
-          sid: window.sessionStorage.getItem('token'),
+          sid: window.localStorage.getItem('token'),
           handle,
           pageNum,
           pageSize: 10

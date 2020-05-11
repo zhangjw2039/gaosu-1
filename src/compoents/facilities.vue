@@ -23,19 +23,41 @@ export default {
   },
   methods: {
     async onSearch () {
-      var arr = this.value.split('/')
-      console.log(arr)
-      const { data } = await this.$ajax.get('http://192.168.0.80:9090/conveniently', {
+      console.log(this.value)
+      const { data } = await this.$ajax.get('QRcode/list', {
         params: {
-          sid: window.sessionStorage.getItem('token'),
-          wholeName: arr[0],
-          codeMessage: arr[1]
+          sid: window.localStorage.getItem('token'),
+          checkName: this.value
         }
       })
       console.log(data)
+      if (data.code === 200) {
+        this.$router.push({
+          path: '/details',
+          name: '/details',
+          query: data.data.rows[0]
+        })
+      } else {
+        this.$toast('无法查询到改信息')
+      }
     },
     smSearch () {
-      this.util.wxScanQRCode.call(this, wx)
+      wx.ready(() => {
+        wx.scanQRCode({
+          needResult: 1,
+          scanType: ['qrCode', 'barCode'],
+          success: (res) => {
+            var result = JSON.stringify(res.resultStr.replace('"', ''))
+            this.value = result
+            console.log(this.value)
+            this.onSearch()
+          }
+        })
+      })
+      wx.error(function (res) {
+        console.log('config信息验证失败会执行error函数')
+      // config信息验证失败会执行error函数，如签名过期导致验证失败，具体错误信息可以打开config的debug模式查看，也可以在返回的res参数中查看，对于SPA可以在这里更新签名。
+      })
     }
   },
   mounted () {

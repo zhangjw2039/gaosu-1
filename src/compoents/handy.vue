@@ -37,10 +37,9 @@
         />
       </van-popup>
     </van-cell-group>
-    <div class="errItemFalseSb-box-item">
+    <!-- <div class="errItemFalseSb-box-item">
       <p class="errItemFalseSb-box-item-l" style="font-weight: 400">所属责任单位</p>
-      <p class="errItemFalseSb-box-item-r">管理员</p>
-    </div>
+    </div> -->
     <div class="errItemFalseSb-box-item">
       <textarea v-model="info" class="thing-miaosu" placeholder="请输入描述"></textarea>
     </div>
@@ -159,6 +158,7 @@ export default {
           var localId = res.localId
           console.log(localId)
           that.voildId = localId
+          that.$toast('结束录音')
         }
       })
     },
@@ -166,6 +166,7 @@ export default {
     // 开始录音
     startVoild () {
       wx.startRecord()
+      this.$toast('开始录音')
     },
 
     // 获取地理位置
@@ -192,31 +193,29 @@ export default {
     // 提交数据
     async uploadMessage () {
       this.loadFlag = true
-      console.log(this.value)
-      console.log(this.value1)
-      console.log(this.info)
-      console.log(this.showImageList)
-      console.log(this.center)
-      console.log(this.voildId)
+      if (this.info.trim() === '' || this.value1.trim() === '' || this.showImageList.length === 0 || this.voildId === '') {
+        this.$toast('信息不完整')
+        this.loadFlag = false
+        return false
+      }
       var params = {}
-      // params.sid = window.sessionStorage.getItem('token')
       params.convenientlyType = 1
       params.convenientlyInfo = this.info
       params.upDown = this.value1 === '上行' ? 1 : 2
-      // params.images = this.showImageList
-      // params.RecordingURL = this.voildId
+      params.pics = this.showImageList
+      params.record = this.voildId
       params.lng = this.center.lng
       params.lat = this.center.lat
       console.log(params)
-      const { data } = await this.$ajax.post('http://192.168.0.80:9090/conveniently?sid=' + window.sessionStorage.getItem('token'), params)
+      const { data } = await this.$ajax.post('conveniently?sid=' + window.localStorage.getItem('token'), params)
       console.log(data)
       if (data.code === 200) {
+        this.$toast('上报成功')
         this.loadFlag = false
+        this.$router.go(-1)
       } else {
         this.$toast('数据提交异常')
       }
-
-      // params.
     }
 
   },

@@ -7,9 +7,9 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     // 扫码信息的id，和采集信息的共享二维码id
-    qrCodeId: '23bb5832198a42e567186f156db17a2c',
+    qrCodeId: '',
     // 扫码巡检的id
-    saomaCodeId: '23bb5832198a42e567186f156db17a2c',
+    saomaCodeId: '',
     // 权限变量
     rols: []
   },
@@ -17,6 +17,9 @@ export default new Vuex.Store({
     // 改变qrCodeId的值
     changQrCodeId (state, value) {
       state.qrCodeId = value
+    },
+    changeSaomaCodeID (state, value) {
+      state.saomaCodeId = value
     },
     // 存储权限值
     saveRols (state, value) {

@@ -2,7 +2,7 @@
   <div class="errItemFalseSb-box">
     <div class="errItemFalseSb-box-item" @click="toMap()">
         <p class="errItemFalseSb-box-item-r" style="padding-right: 12px">{{list.upDown === 1 ? '上行' : '下行'}}
-          <van-icon name="arrow" class="my-icon-center" />
+          <van-icon name="arrow" class="my-icon-nor-center" />
         </p>
         <p class="errItemFalseSb-box-item-l">上报位置
         </p>
@@ -21,11 +21,11 @@
     </div>
     <div class="errItemFalseSb-box-item">
         <h3 class="errItemFalseSb-box-item-t">图片</h3>
-        <img src="../../assets/image/ad35c8d7ly1fnctsb3hvpj22yo1uou10.jpg" alt="">
+        <img v-for="(item, index) in imageList" :key="index" :src="item" alt="">
     </div>
     <div class="errItemFalseSb-box-item">
         <p class="errItemFalseSb-box-item-l">录音</p>
-        <audio class="errItemFalseSb-box-item-audio" src="" controls></audio>
+        <audio class="errItemFalseSb-box-item-audio" :src="recordingURL" controls></audio>
     </div>
     <van-button @click="uploadMessage" class="btm-weixiu" type="danger">维修指派</van-button>
   </div>
@@ -59,6 +59,24 @@ export default {
         name: '/weixiuzhipai',
         query: this.list
       })
+    }
+  },
+  computed: {
+    imageList () {
+      if (this.list.convenientlyImagesURL) {
+        const arr = [];
+        (this.list.convenientlyImagesURL.split(',')).map((item) => {
+          arr.push(this.$ajax.defaults.baseURL + 'images' + item)
+        })
+        return arr
+      }
+      return []
+    },
+    recordingURL () {
+      if (this.list.convenientlyRecordingURL) {
+        return this.$ajax.defaults.baseURL + 'files' + this.list.convenientlyRecordingURL
+      }
+      return ''
     }
   }
 }

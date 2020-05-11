@@ -17,15 +17,15 @@
     </div>
     <div class="errItemFalseSb-box-item">
       <p class="errItemFalseSb-box-item-l">上报描述</p>
-      <textarea readonly v-model="list.convenientlyInfo" class="thing-miaosu" placeholder="请输入巡检描述"></textarea>
+      <textarea readonly v-model="list.convenientlyInfo" class="thing-miaosu"></textarea>
     </div>
     <div class="errItemFalseSb-box-item">
       <h3 class="errItemFalseSb-box-item-t">上报照片</h3>
-      <img src="../../assets/image/ad35c8d7ly1fnctsb3hvpj22yo1uou10.jpg" alt />
+      <img v-for="(item, index) in imageList" :key="index" :src="item" alt />
     </div>
     <div class="errItemFalseSb-box-item">
       <p class="errItemFalseSb-box-item-l">巡检录音</p>
-      <audio class="errItemFalseSb-box-item-audio" src controls></audio>
+      <audio class="errItemFalseSb-box-item-audio" :src="recordingURL" controls></audio>
     </div>
     <div class="errItemFalseSb-box-item">
       <h1 class="errItemFalseSb-box-item-h1">指派信息</h1>
@@ -44,7 +44,7 @@
     </div>
     <div class="errItemFalseSb-box-item">
       <p class="errItemFalseSb-box-item-l">维修方案</p>
-      <textarea readonly v-model="list.repairorderInfo" class="thing-miaosu" placeholder="请输入巡检描述"></textarea>
+      <textarea readonly v-model="list.repairorderInfo" class="thing-miaosu"></textarea>
     </div>
     <div class="errItemFalseSb-box-item">
       <p class="errItemFalseSb-box-item-l">指派维修单位</p>
@@ -52,7 +52,7 @@
     </div>
 
     <div class="errItemFalseSb-box-item">
-      <h1 class="errItemFalseSb-box-item-h1">指派审核信息</h1>
+      <h1 class="errItemFalseSb-box-item-h1">审核信息</h1>
     </div>
     <div class="errItemFalseSb-box-item">
       <p class="errItemFalseSb-box-item-l">审核人</p>
@@ -67,12 +67,12 @@
       <p class="errItemFalseSb-box-item-r">{{list.endTime}}</p>
     </div>
     <div class="errItemFalseSb-box-item">
-      <h3 class="errItemFalseSb-box-item-t">上报照片</h3>
-      <img src="../../assets/image/ad35c8d7ly1fnctsb3hvpj22yo1uou10.jpg" alt />
+      <h3 class="errItemFalseSb-box-item-t">维修照片</h3>
+      <img v-for="(item, index) in repairorderImagesURL" :key="index" :src="item" alt />
     </div>
     <div class="errItemFalseSb-box-item">
       <p class="errItemFalseSb-box-item-l">录音</p>
-      <audio class="errItemFalseSb-box-item-audio" src controls></audio>
+      <audio class="errItemFalseSb-box-item-audio" :src="repairorderRecordingURL" controls></audio>
     </div>
     <div class="errItemFalseSb-box-item">
       <p class="errItemFalseSb-box-item-l">审核描述</p>
@@ -109,6 +109,40 @@ export default {
   mounted () {
     this.list = this.$route.query
     console.log(this.list)
+  },
+  computed: {
+    imageList () {
+      if (this.list.convenientlyImagesURL) {
+        const arr = [];
+        (this.list.convenientlyImagesURL.split(',')).map((item) => {
+          arr.push(this.$ajax.defaults.baseURL + 'images' + item)
+        })
+        return arr
+      }
+      return []
+    },
+    recordingURL () {
+      if (this.list.convenientlyRecordingURL) {
+        return this.$ajax.defaults.baseURL + 'files' + this.list.convenientlyRecordingURL
+      }
+      return ''
+    },
+    repairorderImagesURL () {
+      if (this.list.repairorderImagesURL) {
+        const arr = [];
+        (this.list.repairorderImagesURL.split(',')).map((item) => {
+          arr.push(this.$ajax.defaults.baseURL + 'images' + item)
+        })
+        return arr
+      }
+      return []
+    },
+    repairorderRecordingURL () {
+      if (this.list.repairorderRecordingURL) {
+        return this.$ajax.defaults.baseURL + 'files' + this.list.repairorderRecordingURL
+      }
+      return ''
+    }
   }
 }
 </script>

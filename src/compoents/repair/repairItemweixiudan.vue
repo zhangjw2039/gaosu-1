@@ -1,37 +1,37 @@
 <template>
   <div class="errItemFalseSb-box">
     <div class="errItemFalseSb-box-item">
-      <p class="errItemFalseSb-box-item-l">{{list.wholeTypeName}}</p>
-      <p class="errItemFalseSb-box-item-r">类型</p>
+      <p class="errItemFalseSb-box-item-r">{{list.wholeTypeName}}</p>
+      <p class="errItemFalseSb-box-item-l">类型</p>
     </div>
     <div class="errItemFalseSb-box-item">
-      <p class="errItemFalseSb-box-item-r" @click="toMap" style="padding-right: 13px">桩号位置
+      <p class="errItemFalseSb-box-item-l" @click="toMap" style="padding-right: 13px">桩号位置
         <van-icon name="arrow" class="my-icon-center" />
       </p>
     </div>
     <div class="errItemFalseSb-box-item">
-      <p class="errItemFalseSb-box-item-l">{{list.groupName}}</p>
-      <p class="errItemFalseSb-box-item-r">责任单位</p>
+      <p class="errItemFalseSb-box-item-r">{{list.groupName}}</p>
+      <p class="errItemFalseSb-box-item-l">责任单位</p>
     </div>
     <div class="errItemFalseSb-box-item">
-      <p class="errItemFalseSb-box-item-l">{{list.examineTime}}</p>
-      <p class="errItemFalseSb-box-item-r">巡检时间</p>
+      <p class="errItemFalseSb-box-item-r">{{list.examineTime}}</p>
+      <p class="errItemFalseSb-box-item-l">巡检时间</p>
     </div>
     <div class="errItemFalseSb-box-item">
-      <p class="errItemFalseSb-box-item-l">{{list.USERNAME}}</p>
-      <p class="errItemFalseSb-box-item-r">巡检人</p>
+      <p class="errItemFalseSb-box-item-r">{{list.USERNAME}}</p>
+      <p class="errItemFalseSb-box-item-l">巡检人</p>
     </div>
     <div class="errItemFalseSb-box-item">
-      <p class="errItemFalseSb-box-item-l">未定...</p>
-      <p class="errItemFalseSb-box-item-r">巡检状态</p>
+      <p class="errItemFalseSb-box-item-r">未定...</p>
+      <p class="errItemFalseSb-box-item-l">巡检状态</p>
     </div>
     <div class="errItemFalseSb-box-item">
       <h3 class="errItemFalseSb-box-item-t">巡检图片/视频</h3>
-      <img src="../../assets/image/ad35c8d7ly1fnctsb3hvpj22yo1uou10.jpg" alt />
+      <img v-for="(item, index) in imageList" :key="index" :src="item" alt="">
     </div>
     <div class="errItemFalseSb-box-item">
       <p class="errItemFalseSb-box-item-l">巡检录音</p>
-      <audio class="errItemFalseSb-box-item-audio" src controls></audio>
+      <audio class="errItemFalseSb-box-item-audio" :src="recordingURL" controls></audio>
     </div>
     <div class="errItemFalseSb-box-item">
       <h1 class="errItemFalseSb-box-item-h1">巡检描述</h1>
@@ -68,6 +68,24 @@ export default {
   mounted () {
     this.list = this.$route.query
     console.log(this.list)
+  },
+  computed: {
+    imageList () {
+      if (this.list.checkImagesURL) {
+        const arr = [];
+        (this.list.checkImagesURL.split(',')).map((item) => {
+          arr.push(this.$ajax.defaults.baseURL + 'images' + item)
+        })
+        return arr
+      }
+      return []
+    },
+    recordingURL () {
+      if (this.list.checkRecordingURL) {
+        return this.$ajax.defaults.baseURL + 'files' + this.list.checkRecordingURL
+      }
+      return ''
+    }
   }
 }
 </script>

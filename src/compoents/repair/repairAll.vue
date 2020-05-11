@@ -1,37 +1,6 @@
 <template>
   <div class="record-box">
     <van-tabs v-model="active" @click="toggle">
-      <van-tab title="指派审核">
-        <div class="van-tab-fen">
-          <van-list>
-            <!-- 指派审核这杯展示页面 -->
-            <div class="van-list-box" v-show="active1 === 0">
-              <div class="van-list-box-message">
-                <van-cell v-for="(item, index) in dataList1" :key="index" @click="goMessage(item, '/repairItemzhipai')">
-                  <p class="van-cell-title">{{item.bzWholeName}}</p>
-                  <p class="van-cell-date">{{item.checkquestionTime}}</p>
-                </van-cell>
-              </div>
-              <div class="van-list-page">
-                <van-pagination @change="changePage(1)" v-model="pageNum1" :page-count="Math.ceil(total1/10)" mode="simple" />
-              </div>
-            </div>
-
-            <!-- 指派审核随手报展示数据 -->
-            <div class="van-list-box" v-show="active1 === 1">
-              <div class="van-list-box-message">
-                <van-cell v-for="(item, index) in dataList2" :key="index" @click="goMessage(item, '/repairItemzhipaiPe')">
-                  <p class="van-cell-title">{{item.zpName}}</p>
-                  <p class="van-cell-date">{{item.assignTime}}</p>
-                </van-cell>
-              </div>
-              <div class="van-list-page">
-                <van-pagination @change="changePage(2)" v-model="pageNum2" :page-count="Math.ceil(total2/10)" mode="simple" />
-              </div>
-            </div>
-          </van-list>
-        </div>
-      </van-tab>
       <van-tab title="维修单">
         <div class="van-tab-fen">
           <van-list>
@@ -39,7 +8,7 @@
             <div class="van-list-box" v-show="active1 === 0">
               <div class="van-list-box-message">
                 <van-cell v-for="(item, index) in dataList3" :key="index" @click="goMessage(item, '/repairItemweixiudan')">
-                  <p class="van-cell-title">{{item.bzWholeName}}</p>
+                  <p class="van-cell-title">{{item.wholeTypeName}}</p>
                   <p class="van-cell-date">{{item.checkquestionTime}}</p>
                 </van-cell>
               </div>
@@ -52,7 +21,7 @@
             <div class="van-list-box" v-show="active1 === 1">
               <div class="van-list-box-message">
                 <van-cell v-for="(item, index) in dataList4" :key="index" @click="goMessage(item, '/repairItemwxdp')">
-                  <p class="van-cell-title">{{item.zpName}}</p>
+                  <p class="van-cell-title">{{item.ssbtype}}</p>
                   <p class="van-cell-date">{{item.assignTime}}</p>
                 </van-cell>
               </div>
@@ -70,7 +39,7 @@
             <div class="van-list-box" v-show="active1 === 0">
               <div class="van-list-box-message">
                 <van-cell v-for="(item, index) in dataList5" :key="index" @click="goMessage(item, '/repairItemyanshousb')">
-                  <p class="van-cell-title">{{item.bzWholeName}}</p>
+                  <p class="van-cell-title">{{item.wholeTypeName}}</p>
                   <p class="van-cell-date">{{item.checkquestionTime}}</p>
                 </van-cell>
               </div>
@@ -82,7 +51,7 @@
             <div class="van-list-box" v-show="active1 === 1">
               <div class="van-list-box-message">
                 <van-cell v-for="(item, index) in dataList6" :key="index" @click="goMessage(item, '/repairItemyanshoupe')">
-                  <p class="van-cell-title">{{item.zpName}}</p>
+                  <p class="van-cell-title">{{item.ssbtype}}</p>
                   <p class="van-cell-date">{{item.assignTime}}</p>
                 </van-cell>
               </div>
@@ -100,7 +69,7 @@
             <div class="van-list-box" v-show="active1 === 0">
               <div class="van-list-box-message">
                 <van-cell v-for="(item, index) in dataList7" :key="index" @click="goMessage(item, '/repairItemywxsb')">
-                  <p class="van-cell-title">{{item.bzWholeName}}</p>
+                  <p class="van-cell-title">{{item.wholeTypeName}}</p>
                   <p class="van-cell-date">{{item.checkquestionTime}}</p>
                 </van-cell>
               </div>
@@ -112,7 +81,7 @@
             <div class="van-list-box" v-show="active1 === 1">
               <div class="van-list-box-message">
                 <van-cell v-for="(item, index) in dataList8" :key="index" @click="goMessage(item, '/repairItemywxpe')">
-                  <p class="van-cell-title">{{item.zpName}}</p>
+                  <p class="van-cell-title">{{item.ssbtype}}</p>
                   <p class="van-cell-date">{{item.assignTime}}</p>
                 </van-cell>
               </div>
@@ -136,14 +105,7 @@ export default {
     return {
       active: 1,
       active1: 0,
-      // 指派审核设备数据
-      dataList1: [],
-      pageNum1: 1,
-      total1: 1,
-      // 指派审核随手报数据
-      dataList2: [],
-      pageNum2: 1,
-      total2: 1,
+
       // 维修单设备数据
       dataList3: [],
       pageNum3: 1,
@@ -176,11 +138,7 @@ export default {
     toggle () {},
     // 切换下一页
     changePage (index) {
-      if (index === 1) {
-        this.getSbData(4, this.pageNum1)
-      } else if (index === 2) {
-        this.getPeData(4, this.pageNum2)
-      } else if (index === 3) {
+      if (index === 3) {
         this.getSbData(0, this.pageNum3)
       } else if (index === 4) {
         this.getPeData(0, this.pageNum4)
@@ -205,7 +163,7 @@ export default {
     async getSbData (state, pageNum = 1) {
       const { data } = await this.$ajax.get('repairOrder/checkList', {
         params: {
-          sid: window.sessionStorage.getItem('token'),
+          sid: window.localStorage.getItem('token'),
           pageNum,
           pageSize: 10,
           handle: state
@@ -213,10 +171,7 @@ export default {
       })
       console.log(data)
       if (data.code === 200) {
-        if (state === 4) {
-          this.dataList1 = data.data.rows
-          this.total1 = data.data.total
-        } else if (state === 0) { // 获取的是维修单设备数据
+        if (state === 0) { // 获取的是维修单设备数据
           this.dataList3 = data.data.rows
           this.total3 = data.data.total
         } else if (state === 1) { // 获取的是维修验收的设备数据
@@ -234,7 +189,7 @@ export default {
     async getPeData (state, pageNum = 1) {
       const { data } = await this.$ajax.get('repairOrder/reportList', {
         params: {
-          sid: window.sessionStorage.getItem('token'),
+          sid: window.localStorage.getItem('token'),
           pageNum,
           pageSize: 10,
           handle: state
@@ -242,10 +197,7 @@ export default {
       })
       console.log(data)
       if (data.code === 200) {
-        if (state === 4) { // 获取的是指派审核的随手报数据
-          this.dataList2 = data.data.rows
-          this.total2 = data.data.total
-        } else if (state === 0) { // 获取的是维修单的随手报的数据
+        if (state === 0) { // 获取的是维修单的随手报的数据
           this.dataList4 = data.data.rows
           this.total4 = data.data.total
         } else if (state === 1) { // 获取的是维修验收的随手报数据

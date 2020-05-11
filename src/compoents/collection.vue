@@ -4,7 +4,7 @@
       <p>设施采集</p>
     </div>
     <div class="collection-form">
-      <van-field v-model="name" label="巡检点名称" placeholder="请输入巡检设备名称" />
+      <van-field v-model="name" label="巡检点名称" placeholder="请输入巡检点名称" />
       <van-field
         readonly
         clickable
@@ -50,11 +50,11 @@
         </div>
       </div>
     </div>
-    <van-button class="van-btn-80" type="primary" @click="uploadImageData">完成采集</van-button>
+    <van-button :loading="loading" class="van-btn-80" type="primary" @click="uploadImageData">完成采集</van-button>
     <!-- 弹出层 -->
     <van-popup v-model="showToggle">
       <div>
-        <img class="showToggl-img" alt="">
+        <img class="showToggl-img" alt="" :src="showImageList[toggleIndex]">
       </div>
     </van-popup>
   </div>
@@ -77,13 +77,17 @@ export default {
       // 选择框是否展示
       showPicker: false,
 
-      // 图片上传
+      // 图片选择
       fileList: [],
+      // 图片上传
+      uoloadImageList: [],
 
       // 图片预览的数组
       showImageList: [],
       showToggle: false,
-      toggleIndex: 0
+      toggleIndex: 0,
+
+      loading: false
     }
   },
   methods: {
@@ -112,19 +116,16 @@ export default {
     getLocationAngin () {
       this.getLocation()
     },
-
     // 上传图片
     getImage () {
       const that = this
       wx.ready(function () {
         wx.chooseImage({
-          count: 1, // 默认9
+          count: 5, // 默认9
           sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
           sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
           success: function (res) {
-            if (res.localIds) {
-              that.showImageList.push(res.localIds[0])
-            }
+            that.showImageList.push(res.localIds[0])
           }
         })
       })
@@ -144,7 +145,7 @@ export default {
 
     // 获取类型数据
     async getColumns () {
-      const res = await this.$ajax.get('wholetype/child?sid=' + window.sessionStorage.getItem('token'))
+      const res = await this.$ajax.get('wholetype/child?sid=' + window.localStorage.getItem('token'))
       console.log(res)
       var { data: { data } } = res
       this.columnsAll = data
@@ -155,20 +156,42 @@ export default {
     },
     // 提交填写好的信息
     async uploadImageData () {
-      // if (this.name.trim() === '' || this.typeName.trim() === '' || this.showImageList.length === 0) {
-      //   this.$toast('请将信息填写完整')
-      //   return
-      // }
+      if (this.name.trim() === '' || this.typeName.trim() === '' || this.showImageList.length === 0) {
+        this.$toast('信息不完整')
+        return
+      }
+      this.showImageList.map((item) => {
+        wx.ready(function () {
+          wx.uploadImage({
+            localId: item, // 需要上传的图片的本地ID，由chooseImage接口获得
+            isShowProgressTips: 1, // 默认为1，显示进度提示
+            success: (res) => {
+              this.uoloadImageList.push(res.serverId)
+            }
+          })
+        })
+        wx.error(function (res) {
+          this.$toast('图片上传失败')
+          return false
+        })
+      })
+      this.loading = true
       var parms = {}
       parms.codeMessage = this.$store.state.qrCodeId
       parms.wholeName = this.name
       // parms.wholeType = this.typeName
       parms.lng = this.center.lng
       parms.lat = this.center.lat
-      parms.pics = this.showImageList
+      parms.pics = this.uoloadImageList
       parms.parentIds = this.columnsAll[this.columns.indexOf(this.typeName)].parentIds
-      const data = await this.$ajax.post('QRcode/bindQRcode?sid=' + window.sessionStorage.getItem('token'), parms)
-      console.log(data)
+      const { data } = await this.$ajax.post('QRcode/bindQRcode?sid=' + window.localStorage.getItem('token'), parms)
+      if (data.code === 200) {
+        this.$toast('绑定成功')
+        this.$router.push('/home')
+      } else {
+        this.$toast(data.jwje)
+      }
+      this.loading = false
     }
   },
   mounted () {
@@ -258,7 +281,6 @@ export default {
   display: block;
   width: 100%;
   height: 200px;
-  background: red;
 }
 .van-btn-80 {
   width: 80%;

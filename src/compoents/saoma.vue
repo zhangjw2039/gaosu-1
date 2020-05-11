@@ -2,14 +2,15 @@
   <div>
     <!-- 轮播图位置 -->
     <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
-      <van-swipe-item>1</van-swipe-item>
-      <van-swipe-item>2</van-swipe-item>
+      <van-swipe-item v-for="(item, index) in imageList" :key="index">
+        <img :src="item" alt="">
+      </van-swipe-item>
     </van-swipe>
 
     <!-- 展示信息 -->
     <div class="message-box">
       <div class="errItemFalseSb-box-item">
-        <p class="errItemFalseSb-box-item-l" style="font-weight: 400">测试位置</p>
+        <p class="errItemFalseSb-box-item-l" style="font-weight: 400">类型</p>
         <p class="errItemFalseSb-box-item-r">{{saomaMessage.wholeTypeName}}</p>
       </div>
       <div class="errItemFalseSb-box-item">
@@ -17,24 +18,16 @@
         <p class="errItemFalseSb-box-item-r">{{dateMessage}}</p>
       </div>
       <div class="errItemFalseSb-box-item" @click="toMap">
-        <p class="errItemFalseSb-box-item-l">上行 下行</p>
-        <p class="errItemFalseSb-box-item-r" style="padding-right: 20px">
-          桩号位置
-          <van-icon name="arrow" class="my-icon-center" />
-        </p>
+        <p class="errItemFalseSb-box-item-l">桩号位置</p>
+        <van-icon name="arrow" class="my-icon-center" />
       </div>
       <div class="errItemFalseSb-box-item" @click="goXunjian">
-        <p class="errItemFalseSb-box-item-l">{{saomaMessage.createTime}}</p>
-        <p class="errItemFalseSb-box-item-r" style="padding-right: 20px">
-          巡检记录
-          <van-icon name="arrow" class="my-icon-center" />
-        </p>
+        <p class="errItemFalseSb-box-item-l">巡检记录</p>
+        <van-icon name="arrow" class="my-icon-center" />
       </div>
       <div class="errItemFalseSb-box-item" @click="goWeixiu()">
-        <p class="errItemFalseSb-box-item-r" style="padding-right: 20px">
-          维修记录
-          <van-icon name="arrow" class="my-icon-center" />
-        </p>
+        <p class="errItemFalseSb-box-item-l">维修记录</p>
+        <van-icon name="arrow" class="my-icon-center" />
       </div>
       <van-radio-group v-model="radio">
         <div class="errItemFalseSb-box-item">
@@ -84,7 +77,7 @@
                 @click="deleteImage(index)"
                 color="#c81912"
               />
-              <img src="item" alt @click="toggleShowImg(index)" />
+              <img :src="item" alt @click="toggleShowImg(index)" />
             </div>
             <div v-show="showImageList.length !== 5" class="add-image" @click="getImage"></div>
           </div>
@@ -110,7 +103,7 @@
 
       <div class="errItemFalseSb-box-item">
         <p class="errItemFalseSb-box-item-l">位置</p>
-        <p class="errItemFalseSb-box-item-l">lat:{{saomaMessage.lat}}, lng:{{saomaMessage.lng}}</p>
+        <p class="errItemFalseSb-box-item-l">lat:{{center.lat}}, lng:{{center.lng}}</p>
         <span class="get-location-angin" @click="getLocationAngin">重新获取</span>
       </div>
       <div class="collection-map">
@@ -131,7 +124,6 @@
         loading-text="提交中..."
       >完成巡检</van-button>
     </div>
-
     <!-- 弹出层 -->
     <van-popup v-model="showToggle">
       <div>
@@ -160,6 +152,7 @@ export default {
 
       // 存储相片
       showImageList: [],
+      uploadImageList: [],
 
       // 弹出框
       showToggle: false,
@@ -212,17 +205,21 @@ export default {
     // 获取后端数据函数
     async getSaomaMessage () {
       // 根据扫描出来的二维码id获取后端数据
-      const { data: { data } } = await this.$ajax.get('QRcode/checkQRcode', {
+      console.log(this.$store.state.saomaCodeId)
+      const { data } = await this.$ajax.get('QRcode/checkQRcode', {
         params: {
-          sid: window.sessionStorage.getItem('token'),
+          sid: window.localStorage.getItem('token'),
           codeMessage: this.$store.state.saomaCodeId
         }
       })
-      if (data) {
-        this.saomaMessage = data[0]
-        console.log(this.saomaMessage)
+      console.log(data)
+      if (data.code === 500) {
+        this.$toast('数据获取失败')
       } else {
         // 如果没有数据，则请求数据失败处理
+        this.saomaMessage = data.data
+        console.log(this.saomaMessage)
+        this.$toast('数据获取成功')
       }
     },
 
@@ -259,9 +256,7 @@ export default {
           sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
           sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
           success: res => {
-            if (res.localIds) {
-              this.showImageList.push(res.localIds[0])
-            }
+            this.showImageList.push(res.localIds[0])
           }
         })
       })
@@ -305,20 +300,45 @@ export default {
       if (this.radio === '1') {
         params.flag = 0
       } else {
+        this.showImageList.map((item) => {
+          wx.ready(function () {
+            wx.uploadImage({
+              localId: item, // 需要上传的图片的本地ID，由chooseImage接口获得
+              isShowProgressTips: 1, // 默认为1，显示进度提示
+              success: (res) => {
+                this.uploadImageList.push(res.serverId)
+              }
+            })
+          })
+          wx.error(function (res) {})
+        })
         params.flag = 1
         params.abnormalGrade = this.value
-        params.pics = this.showImageList
+        params.pics = this.uploadImageList
         params.record = this.voildId
         params.checkquestionInfo = this.thingMessage
+        if (this.thingMessage.trim() === '' || this.voildId === '' || this.showImageList.length === 0 || this.value.trim() === '') {
+          this.loadFlag = false
+          this.$toast('信息不完整')
+          return false
+        }
       }
-      const data = await this.$ajax.post('chkQuestion?sid=' + window.sessionStorage.getItem('token'), params)
+      console.log(params)
+      const { data } = await this.$ajax.post('chkQuestion?sid=' + window.localStorage.getItem('token'), params)
       console.log(data)
+      if (data.code === 200) {
+        this.$toast('数据提交成功')
+        this.$router.push('/home')
+      } else {
+        this.$toast('数据提交失败')
+      }
       this.loadFlag = false
     },
 
     // 开始录音
     startVoild () {
       wx.startRecord()
+      this.$toast('开始录音')
     },
     // 停止录音
     endVoild () {
@@ -328,8 +348,21 @@ export default {
           var localId = res.localId
           console.log(localId)
           that.voildId = localId
+          that.toast('结束录音')
         }
       })
+    }
+  },
+  computed: {
+    imageList () {
+      if (Object.keys(this.saomaMessage).length === 0) {
+        return []
+      }
+      const arr = [];
+      (this.saomaMessage.image.split(',')).map((item) => {
+        arr.push(this.$ajax.defaults.baseURL + 'images' + item)
+      })
+      return arr
     }
   }
 }
@@ -338,9 +371,14 @@ export default {
 .my-swipe .van-swipe-item {
   color: #fff;
   font-size: 20px;
-  line-height: 150px;
+  height: 200px;
   text-align: center;
   background-color: #39a9ed;
+}
+.van-swipe-item img {
+  display: block;
+  height: 100%;
+  width: 100%;
 }
 .van-field-nopadding {
   padding: 0 10px !important;

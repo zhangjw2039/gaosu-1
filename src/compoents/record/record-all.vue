@@ -72,7 +72,7 @@ export default {
     async getMyData (pageNum = 1) {
       const { data } = await this.$ajax.get('chkQuestion/my', {
         params: {
-          sid: window.sessionStorage.getItem('token'),
+          sid: window.localStorage.getItem('token'),
           pageNum
         }
       })
@@ -88,7 +88,7 @@ export default {
     async getMyTeamData (pageNum = 1) {
       const { data } = await this.$ajax.get('chkQuestion/myGroup', {
         params: {
-          sid: window.sessionStorage.getItem('token'),
+          sid: window.localStorage.getItem('token'),
           pageNum
         }
       })

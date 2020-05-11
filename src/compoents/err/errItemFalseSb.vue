@@ -27,11 +27,11 @@
     </div>
     <div class="errItemFalseSb-box-item">
         <h3 class="errItemFalseSb-box-item-t">巡检图片/视频</h3>
-        <img src="../../assets/image/ad35c8d7ly1fnctsb3hvpj22yo1uou10.jpg" alt="">
+        <img v-for="(item, index) in imageList" :key="index" :src="item" alt="">
     </div>
     <div class="errItemFalseSb-box-item">
         <p class="errItemFalseSb-box-item-l">巡检录音</p>
-        <audio class="errItemFalseSb-box-item-audio" src="" controls></audio>
+        <audio class="errItemFalseSb-box-item-audio" :src="recordingURL" controls></audio>
     </div>
     <div class="errItemFalseSb-box-item">
         <h3 class="errItemFalseSb-box-item-t">巡检描述</h3>
@@ -79,6 +79,24 @@ export default {
     // 模版加载之前获取路由携带过来的信息
     this.list = this.$route.query
     console.log(this.list)
+  },
+  computed: {
+    imageList () {
+      if (this.list.checkImagesURL) {
+        const arr = [];
+        (this.list.checkImagesURL.split(',')).map((item) => {
+          arr.push(this.$ajax.defaults.baseURL + 'images' + item)
+        })
+        return arr
+      }
+      return []
+    },
+    recordingURL () {
+      if (this.list.checkRecordingURL) {
+        return this.$ajax.defaults.baseURL + 'files' + this.list.checkRecordingURL
+      }
+      return ''
+    }
   }
 }
 </script>

@@ -1,18 +1,16 @@
 <template>
   <div>
-    <div class="errItemFalseSb-box-item">
-      <p class="errItemFalseSb-box-item-l">lat:{{list.lat}}, lng:{{list.lng}}</p>
-      <p class="errItemFalseSb-box-item-r" style="padding-right: 12px">桩号位置
-         <van-icon name="arrow" class="my-icon-center" />
-      </p>
+    <div class="errItemFalseSb-box-item" @click="toMap">
+      <p class="errItemFalseSb-box-item-l">桩号位置</p>
+      <van-icon name="arrow" class="my-icon-nof-center" />
     </div>
-    <div class="errItemFalseSb-box-item">
+    <div class="errItemFalseSb-box-item" @click="toDetails">
       <p class="errItemFalseSb-box-item-l">设施异常详情</p>
       <van-icon name="arrow" class="my-icon-nof-center" />
     </div>
     <div class="errItemFalseSb-box-item">
-      <p class="errItemFalseSb-box-item-l">{{list.assignTime}}</p>
-      <p class="errItemFalseSb-box-item-r">指派时间</p>
+      <p class="errItemFalseSb-box-item-r">{{list.assignTime}}</p>
+      <p class="errItemFalseSb-box-item-l">指派时间</p>
     </div>
     <!-- 上传图片 -->
     <div class="errItemFalseSb-box-item">
@@ -43,11 +41,12 @@
     <div class="errItemFalseSb-box-item">
       <textarea v-model="info" class="thing-miaosu" placeholder="维修描述"></textarea>
     </div>
-    <van-button class="btm-msg" type="primary" @click="upload">完成维修</van-button>
+    <van-button :loading="loading" :disabled="!rols1" class="btm-msg" type="primary" @click="upload">完成维修</van-button>
   </div>
 </template>
 <script>
 import wx from 'weixin-js-sdk'
+import { mapState } from 'vuex'
 export default {
   data () {
     return {
@@ -56,7 +55,8 @@ export default {
       //   录音
       localId: '',
       info: '',
-      list: {}
+      list: {},
+      loading: false
     }
   },
   methods: {
@@ -96,7 +96,12 @@ export default {
     },
     // 上传数据
     async upload () {
-      const { data } = await this.$ajax.post(`repairOrder/complete?sid=${window.sessionStorage.getItem('token')}&type=1`, {
+      if (this.localId === '' || this.showImageList.length === 0 || this.info.trim() === '') {
+        this.$toast('信息不全')
+        return
+      }
+      this.loading = true
+      const { data } = await this.$ajax.post(`repairOrder/complete?sid=${window.localStorage.getItem('token')}&type=1`, {
         id: this.list.id,
         record: this.localId,
         pics: this.showImageList,
@@ -110,6 +115,24 @@ export default {
       } else {
         this.$toast('维修提交失败')
       }
+      this.loading = false
+    },
+    toDetails () {
+      this.$router.push({
+        path: '/details',
+        name: '/details',
+        query: this.list
+      })
+    },
+    toMap () {
+      this.$router.push({
+        path: '/map',
+        name: '/map',
+        query: {
+          lat: this.list.lat,
+          lng: this.list.lng
+        }
+      })
     }
   },
   mounted () {
@@ -117,6 +140,12 @@ export default {
     this.util.wxConfig.call(this, wx)
     this.list = this.$route.query
     console.log(this.list)
+  },
+  computed: {
+    ...mapState(['rols']),
+    rols1 () {
+      return this.rols.includes('repairOrder:complete')
+    }
   }
 }
 </script>

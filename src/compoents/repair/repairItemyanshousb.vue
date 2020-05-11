@@ -1,18 +1,16 @@
 <template>
   <div>
     <div class="errItemFalseSb-box-item">
-      <p class="errItemFalseSb-box-item-l">{{list.id}}</p>
-      <p class="errItemFalseSb-box-item-r">维修单号</p>
+      <p class="errItemFalseSb-box-item-r">{{list.id}}</p>
+      <p class="errItemFalseSb-box-item-l">维修单号</p>
     </div>
     <div class="errItemFalseSb-box-item">
-      <p class="errItemFalseSb-box-item-l">lat:{{list.lat}}, lng:{{list.lng}}</p>
-      <p class="errItemFalseSb-box-item-r" @click="toMap" style="padding-right: 13px">桩号
-        <van-icon name="arrow" class="my-icon-center" />
-      </p>
+      <p class="errItemFalseSb-box-item-l" @click="toMap">桩号</p>
+      <van-icon name="arrow" class="my-icon-center" />
     </div>
     <div class="errItemFalseSb-box-item">
-      <p class="errItemFalseSb-box-item-l">{{list.groupName}}</p>
-      <p class="errItemFalseSb-box-item-r">管理单位</p>
+      <p class="errItemFalseSb-box-item-r">{{list.groupName}}</p>
+      <p class="errItemFalseSb-box-item-l">管理单位</p>
     </div>
     <div class="errItemFalseSb-box-item">
       <p class="errItemFalseSb-box-item-l">设施异常详情</p>
@@ -22,8 +20,8 @@
       <h1 class="errItemFalseSb-box-item-h1">巡检信息</h1>
     </div>
     <div class="errItemFalseSb-box-item">
-      <p class="errItemFalseSb-box-item-l">{{list.chkUserName}}</p>
-      <p class="errItemFalseSb-box-item-r">巡检人</p>
+      <p class="errItemFalseSb-box-item-r">{{list.chkUserName}}</p>
+      <p class="errItemFalseSb-box-item-l">巡检人</p>
     </div>
     <div class="errItemFalseSb-box-item">
       <p class="errItemFalseSb-box-item-l">维修方案</p>
@@ -31,26 +29,26 @@
     </div>
     <div class="errItemFalseSb-box-item">
       <h3 class="errItemFalseSb-box-item-t">图片/视频</h3>
-      <img src="../../assets/image/ad35c8d7ly1fnctsb3hvpj22yo1uou10.jpg" alt />
+      <img v-for="(item, index) in imageList" :key="index" :src="item" alt />
     </div>
     <div class="errItemFalseSb-box-item">
       <p class="errItemFalseSb-box-item-l">巡检录音</p>
-      <audio class="errItemFalseSb-box-item-audio" src controls></audio>
+      <audio class="errItemFalseSb-box-item-audio" :src="recordingURL" controls></audio>
     </div>
     <div class="errItemFalseSb-box-item">
       <h1 class="errItemFalseSb-box-item-h1">维修信息</h1>
     </div>
     <div class="errItemFalseSb-box-item">
-      <p class="errItemFalseSb-box-item-l">{{list.assignTime}}</p>
-      <p class="errItemFalseSb-box-item-r">维修指派时间</p>
+      <p class="errItemFalseSb-box-item-r">{{list.assignTime}}</p>
+      <p class="errItemFalseSb-box-item-l">维修指派时间</p>
     </div>
     <div class="errItemFalseSb-box-item">
-      <p class="errItemFalseSb-box-item-l">演示维修单位</p>
-      <p class="errItemFalseSb-box-item-r">维修单位</p>
+      <p class="errItemFalseSb-box-item-r">{{list.groupName}}</p>
+      <p class="errItemFalseSb-box-item-l">维修单位</p>
     </div>
     <div class="errItemFalseSb-box-item">
-      <p class="errItemFalseSb-box-item-l">{{list.repairName}}</p>
-      <p class="errItemFalseSb-box-item-r">维修人</p>
+      <p class="errItemFalseSb-box-item-r">{{list.repairName}}</p>
+      <p class="errItemFalseSb-box-item-l">维修人</p>
     </div>
     <div class="errItemFalseSb-box-item">
       <p class="errItemFalseSb-box-item-l">维修描述</p>
@@ -58,11 +56,11 @@
     </div>
     <div class="errItemFalseSb-box-item">
       <h3 class="errItemFalseSb-box-item-t">图片/视频</h3>
-      <img src="../../assets/image/ad35c8d7ly1fnctsb3hvpj22yo1uou10.jpg" alt />
+      <img v-for="(item, index) in repairorderImagesURL" :key="index" :src="item" alt />
     </div>
     <div class="errItemFalseSb-box-item">
       <p class="errItemFalseSb-box-item-l">巡检录音</p>
-      <audio class="errItemFalseSb-box-item-audio" src controls></audio>
+      <audio class="errItemFalseSb-box-item-audio" :src="repairorderRecordingURL" controls></audio>
     </div>
     <div class="errItemFalseSb-box-item">
       <p class="errItemFalseSb-box-item-l">验收描述</p>
@@ -83,10 +81,11 @@
     <div class="errItemFalseSb-box-item" v-show="!pass">
         <textarea v-model="info" class="thing-miaosu" placeholder="验收描述"></textarea>
     </div>
-    <van-button @click="upload" color="#1089ff" class="btm-weixiu" type="danger">验收完成</van-button>
+    <van-button :disabled="!rols1" @click="upload" color="#1089ff" class="btm-weixiu" type="danger">验收完成</van-button>
   </div>
 </template>
 <script>
+import { mapState } from 'vuex'
 export default {
   data () {
     return {
@@ -110,7 +109,7 @@ export default {
       this.pass = !this.pass
     },
     async upload () {
-      const { data } = await this.$ajax.post(`repairOrder/checkOrder?sid=${window.sessionStorage.getItem('token')}&type=1&status=${this.pass}`, {
+      const { data } = await this.$ajax.post(`repairOrder/checkOrder?sid=${window.localStorage.getItem('token')}&type=1&status=${this.pass}`, {
         examine: this.successInfo,
         repairorderId: this.list.id
       })
@@ -125,6 +124,44 @@ export default {
   mounted () {
     this.list = this.$route.query
     console.log(this.list)
+  },
+  computed: {
+    ...mapState(['rols']),
+    rols1 () {
+      return this.rols.includes('repairOrder:checkOrder')
+    },
+    imageList () {
+      if (this.list.checkImagesURL) {
+        const arr = [];
+        (this.list.checkImagesURL.split(',')).map((item) => {
+          arr.push(this.$ajax.defaults.baseURL + 'images' + item)
+        })
+        return arr
+      }
+      return []
+    },
+    recordingURL () {
+      if (this.list.checkRecordingURL) {
+        return this.$ajax.defaults.baseURL + 'files' + this.list.checkRecordingURL
+      }
+      return ''
+    },
+    repairorderImagesURL () {
+      if (this.list.repairorderImagesURL) {
+        const arr = [];
+        (this.list.repairorderImagesURL.split(',')).map((item) => {
+          arr.push(this.$ajax.defaults.baseURL + 'images' + item)
+        })
+        return arr
+      }
+      return []
+    },
+    repairorderRecordingURL () {
+      if (this.list.repairorderRecordingURL) {
+        return this.$ajax.defaults.baseURL + 'files' + this.list.repairorderRecordingURL
+      }
+      return ''
+    }
   }
 }
 </script>
